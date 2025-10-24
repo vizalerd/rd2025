@@ -1741,21 +1741,18 @@ import * as THREE from 'three';
         function centerMapOnScreen() {
             const gameMap = document.getElementById('gameMap');
             if (gameMap) {
-                // Плавно прокручиваем к карте
-                gameMap.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'center',
-                    inline: 'center'
-                });
-                
-                // Дополнительная задержка для плавности
-                setTimeout(() => {
+                // Простое центрирование без smooth behavior для совместимости с Tilda
+                try {
                     gameMap.scrollIntoView({ 
-                        behavior: 'smooth', 
                         block: 'center',
                         inline: 'center'
                     });
-                }, 100);
+                } catch (e) {
+                    // Fallback для старых браузеров или Tilda
+                    const rect = gameMap.getBoundingClientRect();
+                    const scrollTop = window.pageYOffset + rect.top - (window.innerHeight / 2);
+                    window.scrollTo(0, scrollTop);
+                }
             }
         }
 
