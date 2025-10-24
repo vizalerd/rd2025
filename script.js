@@ -954,78 +954,9 @@ import * as THREE from 'three';
         // Инициализация GSAP и ScrollTrigger
         gsap.registerPlugin(ScrollTrigger);
 
-        // Замедление скорости скролла с помощью GSAP
-        let scrollTween = null;
-        let isScrollingManually = false;
+        // Обычный скролл без замедления и плавности
 
-        // Функция для плавного скролла с замедлением
-        function smoothScrollTo(targetY) {
-            if (scrollTween) {
-                scrollTween.kill();
-            }
-            
-            // Ограничиваем скролл в пределах документа
-            const maxScroll = document.body.scrollHeight - window.innerHeight;
-            const clampedY = Math.max(0, Math.min(targetY, maxScroll));
-            
-            scrollTween = gsap.to(window, {
-                scrollTo: { y: clampedY },
-                duration: 1.2, // Увеличиваем длительность для более плавного скролла
-                ease: "power2.out",
-                onStart: () => {
-                    isScrollingManually = true;
-                },
-                onComplete: () => {
-                    isScrollingManually = false;
-                }
-            });
-        }
-
-        // Перехват событий колеса мыши с замедлением
-        window.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            
-            // Вычисляем скорость скролла
-            const delta = e.deltaY;
-            const scrollSpeed = 1.1; // Уменьшаем коэффициент для более медленного скролла
-            
-            const currentScrollY = window.scrollY;
-            const newScrollY = currentScrollY + (delta * scrollSpeed);
-            
-            smoothScrollTo(newScrollY);
-        }, { passive: false });
-
-        // Обработка событий клавиатуры с замедлением
-        window.addEventListener('keydown', (e) => {
-            const scrollAmount = 80; // Уменьшаем шаг скролла
-            let newScrollY = window.scrollY;
-            
-            switch(e.key) {
-                case 'ArrowDown':
-                case 'PageDown':
-                case ' ':
-                    e.preventDefault();
-                    newScrollY += scrollAmount;
-                    break;
-                case 'ArrowUp':
-                case 'PageUp':
-                    e.preventDefault();
-                    newScrollY -= scrollAmount;
-                    break;
-                case 'Home':
-                    e.preventDefault();
-                    newScrollY = 0;
-                    break;
-                case 'End':
-                    e.preventDefault();
-                    newScrollY = document.body.scrollHeight;
-                    break;
-                default:
-                    return;
-            }
-            
-            smoothScrollTo(newScrollY);
-        });
+        // Обычный скролл без перехвата событий
 
         
         // Анимации по скроллу для заголовков
