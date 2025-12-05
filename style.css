@@ -582,7 +582,7 @@ canvas {
     top: 40%;
     right: 5svw;
     font-family: 'Cakra', monospace;
-    font-size: 2svw;
+    font-size: 1.6svw;
     font-weight: bold;
     color: var(--dark-gray);
     letter-spacing: 0.2em;
@@ -840,6 +840,68 @@ canvas {
 
 .timeline-wrapper::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5);
+}
+
+/* Контейнер таймлайна со стрелками */
+.timeline-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    width: 100%;
+}
+
+/* Стрелки таймлайна */
+.timeline-arrow {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.timeline-arrow:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.timeline-arrow:active {
+    transform: scale(0.95);
+}
+
+.timeline-arrow:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.timeline-arrow svg {
+    width: 24px;
+    height: 24px;
+}
+
+.timeline-arrow-left {
+    order: -1;
+}
+
+.timeline-arrow-right {
+    order: 1;
+}
+
+/* Обновляем timeline-wrapper для работы со стрелками */
+.timeline-container .timeline-wrapper {
+    flex: 1;
+    min-width: 0;
 }
 
 .timeline {
@@ -1225,12 +1287,11 @@ canvas {
 }
 
 .personality-photo {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
+    width: 20svw;
+    /* height: 180px; */
     overflow: hidden;
     margin-bottom: 20px;
-    border: 3px solid var(--supernova);
+    border: none;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 

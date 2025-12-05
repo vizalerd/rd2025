@@ -9,6 +9,39 @@
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     
+    <!-- Прокрутка в начало при загрузке -->
+    <script>
+        // Отключить автоматическое восстановление позиции скролла
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        
+        // Немедленная прокрутка в начало
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        
+        // Прокрутка при загрузке DOM
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+            });
+        } else {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        }
+        
+        // Прокрутка при полной загрузке
+        window.addEventListener('load', function() {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        });
+    </script>
+    
     <!-- GSAP CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -99,9 +132,9 @@
     </script>
     <script type="module" src="script.js"></script>
     
-    <!-- Заголовок "День Республики" -->
+    <!-- Заголовок "День Независимости" -->
     <div class="title">
-        <h1>День <br> Республики</h1>
+        <h1>День <br> Независимости</h1>
         <div class="title-subtitle">праздник, собравший казахстанцев под одним шаныраком</div>
     </div>
     <div class="title_vert">специальный проект NUR.KZ</div>
@@ -123,8 +156,7 @@
     <!-- Текст, появляющийся при достижении цели юрты -->
     <div class="yurt-target-text">
         <div class="target-text-content">
-            <p>День Республики – национальный праздник, являющийся символом суверенитета Казахстана. Именно 25 октября 1990 года наша страна сделала первый шаг к обретению независимости.</p>
-            <p>За три последних десятилетия законодательное положение Дня Республики менялось несколько раз, но его сегодняшний высокий статус подтверждает историческую важность этой даты.</p>
+            <p>День Независимости – государственный праздник, одна из важнейших дат в истории современного Казахстана. 16 декабря 1991 года Верховный совет принял конституционный закон "О государственной Независимости Республики Казахстан". </p>
         </div>
     </div>
 
@@ -137,7 +169,7 @@
             <div class="description-content">
                 <div class="description-text">
                     <h1>Игра "Спасти празднование"</h1>
-                    <p>Ослушавшись родителей, Ержан, вместо ответсвенной подготовки к празднику, решил отожнуть на диване и заснул. При этом, он забыл закрыть двери и окна! Вдруг, сильный Астанинский ветер унес все продукты и подарки, разбросав их по все стране. И теперь Ержану нужна ваша помощь, чтобы все вернуть на место</p>
+                    <p>Ослушавшись родителей, Ержан, вместо ответсвенной подготовки к празднику, решил отдохнуть на диване и заснул. При этом, он забыл закрыть двери и окна! Вдруг, сильный Астанинский ветер унес все продукты и подарки, разбросав их по всей стране. И теперь Ержану нужна ваша помощь, чтобы все вернуть на место</p>
                     <button class="help-button" onclick="startGame()">Помочь Ержану</button>
                 </div>
                 <div class="description-image">
@@ -341,59 +373,78 @@
     <!-- Второе диалоговое окно для третьего чекпоинта -->
     <div class="dialog-overlay" id="dialogOverlay2">
         <div class="dialog-window">
-            <h2 class="dialog-title">История Дня Республики</h2>
+            <h2 class="dialog-title">История Дня Независимости</h2>
             <img src="https://optim.tildacdn.pro/tild6263-3537-4334-b362-313439643564/-/format/webp/vecher.png.webp" alt="Вечер" class="dialog-timeline-image">
-            <div class="timeline-wrapper">
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-date">25 октября 1990</div>
-                        <div class="timeline-content">
-                            <h4>Принятие декларации о государственном суверенитете Казахской ССР</h4>
+            <div class="timeline-container">
+                <button class="timeline-arrow timeline-arrow-left" id="timelineArrowLeft">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <div class="timeline-wrapper" id="timelineWrapper">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">25 октября 1990</div>
+                            <div class="timeline-content">
+                                <h4>Принятие Декларации «О государственном суверенитете Казахской ССР»</h4>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-date">16 декабря 1991</div>
-                        <div class="timeline-content">
-                            <h4>Принятие конституционного закона «О государственной Независимости Республики Казахстан»</h4>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">1 декабря 1991</div>
+                            <div class="timeline-content">
+                                <h4>Проведены первые прямые выборы президента</h4>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-date">26 декабря 1991</div>
-                        <div class="timeline-content">
-                            <h4>Принятие декларации о прекращении существования СССР</h4>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">10 декабря 1991</div>
+                            <div class="timeline-content">
+                                <h4>Казахская ССР переименована в Республику Казахстан</h4>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-date">18 октября 1995</div>
-                        <div class="timeline-content">
-                            <h4>День Республики объявлен национальным праздником Казахстана</h4>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">16 декабря 1991</div>
+                            <div class="timeline-content">
+                                <h4>Независимость республики официально провозглашена</h4>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-date">13 декабря 2001</div>
-                        <div class="timeline-content">
-                            <h4>Статус Дня Республики изменен: теперь это государственный праздник</h4>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">2 января 1992</div>
+                            <div class="timeline-content">
+                                <h4>Казахстан стал членом ОБСЕ</h4>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-date">22 апреля 2009</div>
-                        <div class="timeline-content">
-                            <h4>День Республики официально исключен из списка государственных праздников</h4>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">2 марта 1992</div>
+                            <div class="timeline-content">
+                                <h4>Казахстан стал членом ООН</h4>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="timeline-item">
-                        <div class="timeline-date">16 июня 2022</div>
-                        <div class="timeline-content">
-                            <h4>Президент РК Касым-Жомарт Токаев выдвинул предложение о возвращении Дню Республики статуса национального праздника</h4>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">7 мая 1992</div>
+                            <div class="timeline-content">
+                                <h4>Созданы Вооруженные силы Казахстана</h4>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">4 июня 1992</div>
+                            <div class="timeline-content">
+                                <h4>Утверждены государственные символы РК – флаг, герб и гимн</h4>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <button class="timeline-arrow timeline-arrow-right" id="timelineArrowRight">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
@@ -401,10 +452,15 @@
     <!-- Третье диалоговое окно для четвертого чекпоинта -->
     <div class="dialog-overlay" id="dialogOverlay3">
         <div class="dialog-window">
-            <h2 class="dialog-title">Цитата из Декларации</h2>
-            <img src="https://optim.tildacdn.pro/tild6239-3366-4663-b761-396666333932/-/resize/600x/-/format/webp/decl.jpeg.webp" alt="Декларация" class="dialog-timeline-image">
+            <h2 class="dialog-title">Закон "О государственной Независимости Республики Казахстан"</h2>
+            <img src="https://raw.githubusercontent.com/vizalerd/rd2025/main/nan.gif" alt="Декларация" class="dialog-timeline-image">
             <div class="dialog-quote">
-                <p>Верховный Совет Казахской Советской Социалистической Республики, выражая волю народа Казахстана, стремясь к созданию достойных и равных условий жизни для всех граждан Республики, считая первостепенной задачу консолидации и укрепления дружбы народов, проживающих в Республике, признавая Всеобщую декларацию прав человека и право наций на свободное самоопределение, осознавая ответственность за судьбу казахской нации, исходя из решимости создания гуманного демократического правового государства, провозглашает государственный суверенитет Казахской Советской Социалистической Республики и принимает настоящую Декларацию.</p>
+                <p><strong>Первые 5 статей:</strong></p><br>
+                <p><strong>Статья 1.</strong> Республика Казахстан – независимое, демократическое и правовое государство. Она обладает всей полнотой власти на своей территории, самостоятельно определяет и проводит внутреннюю и внешнюю политику.</p><br>
+                <p><strong>Статья 2.</strong> Республика Казахстан строит свои взаимоотношения со всеми государствами на принципах международного права.</p><br>
+                <p><strong>Статья 3.</strong> Республика Казахстан открыта для признания ее государственной независимости другими государствами.</p><br>
+                <p><strong>Статья 4.</strong> На всей территории Республики Казахстан действует Конституция и законы Республики Казахстан, а также признанные ею нормы международного права.</p><br>
+                <p><strong>Статья 5.</strong> Территория Республики Казахстан в существующих границах является целостной, неделимой и неприкосновенной.</p><br>
             </div>
         </div>
     </div>
@@ -418,7 +474,7 @@
                     <div class="slider-track" id="sliderTrack">
                         <div class="personality-card active">
                             <div class="personality-photo">
-                                <img src="https://pricom.kz/images/2021/02/proekt.jpg" alt="">
+                                <img src="https://raw.githubusercontent.com/vizalerd/rd2025/main/salyk.gif" alt="Салык Зиманов">
                             </div>
                             <div class="personality-info">
                                 <h3 class="personality-name">Салык Зиманов</h3>
@@ -429,7 +485,7 @@
                         
                         <div class="personality-card">
                             <div class="personality-photo">
-                                <img src="https://upload.wikimedia.org/wikipedia/ru/thumb/6/68/%D0%95%D1%80%D0%B8%D0%BA_%D0%90%D1%81%D0%B0%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2.jpg/230px-%D0%95%D1%80%D0%B8%D0%BA_%D0%90%D1%81%D0%B0%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2.jpg" alt="">
+                                <img src="https://raw.githubusercontent.com/vizalerd/rd2025/main/salyk.gif" alt="">
                             </div>
                             <div class="personality-info">
                                 <h3 class="personality-name">Ерик Асанбаев</h3>
@@ -440,7 +496,7 @@
                         
                         <div class="personality-card">
                             <div class="personality-photo">
-                                <img src="https://scontent.fakx4-1.fna.fbcdn.net/v/t1.6435-9/42254664_1839861222716378_8887242707949322240_n.jpg?stp=dst-jpg_s640x640_tt6&_nc_cat=100&ccb=1-7&_nc_sid=536f4a&_nc_ohc=KZP1vTfLKFYQ7kNvwEHu8Wd&_nc_oc=AdkDKjqWSqmnDmGo7QnC0i2WeevUPUcYmn-I_uyY07U87OW5bahc09FpAZbXnFQhWyw&_nc_zt=23&_nc_ht=scontent.fakx4-1.fna&_nc_gid=3C8o7DJOAfKoisjyUP6x-g&oh=00_AfdNhpVb_jEDIFMWX9jr78cRHfCZfY86VYXTo56Jm02WWw&oe=6922C7A2" alt="">
+                                <img src="https://raw.githubusercontent.com/vizalerd/rd2025/main/salyk.gif" alt="">
                             </div>
                             <div class="personality-info">
                                 <h3 class="personality-name">Зинаида Федотова</h3>
@@ -467,7 +523,7 @@
     <!-- Блок поздравления -->
     <section class="congratulations-section">
         <div class="congratulations-content">
-            <h2 class="congratulations-title">Редакция интернет-портала NUR.KZ поздравляет всех казахстанцев с Днем Республики!</h2>
+            <h2 class="congratulations-title">Редакция интернет-портала NUR.KZ поздравляет всех казахстанцев с Днем Независимости!</h2>
             <div class="congratulations-text">
                 <p>В этот праздник мы желаем вам благополучия, достатка, гармонии и достижения всех заветных целей. Здоровья вам и вашим близким, уюта вашим семейным очагам!</p>
                 <p>Мира и процветания нашему общему большому дому – Казахстану!</p>

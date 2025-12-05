@@ -1,6 +1,22 @@
 import * as THREE from 'three';
         import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
+        // Функция для прокрутки в начало
+        function scrollToTop() {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+            if (window.pageYOffset !== 0) {
+                window.scrollTo(0, 0);
+            }
+        }
+
+        // Прокрутить страницу в начало при выгрузке
+        window.addEventListener('beforeunload', scrollToTop);
+        
+        // Прокрутка сразу при выполнении скрипта
+        scrollToTop();
+
         // Переменные для отслеживания загрузки
         let loadedResources = 0;
         let totalResources = 0;
@@ -665,6 +681,12 @@ import * as THREE from 'three';
 
         // Инициализируем карту после загрузки DOM
         document.addEventListener('DOMContentLoaded', function() {
+            // Прокрутить страницу в начало несколько раз для гарантии
+            scrollToTop();
+            setTimeout(scrollToTop, 0);
+            setTimeout(scrollToTop, 10);
+            setTimeout(scrollToTop, 50);
+            
             // Небольшая задержка для гарантии полной загрузки
             setTimeout(() => {
                 initKazakhstanMap();
@@ -687,12 +709,82 @@ import * as THREE from 'three';
 
         // Альтернативная инициализация при полной загрузке страницы
         window.addEventListener('load', function() {
+            // Прокрутить страницу в начало несколько раз для гарантии
+            scrollToTop();
+            setTimeout(scrollToTop, 0);
+            setTimeout(scrollToTop, 10);
+            setTimeout(scrollToTop, 50);
+            setTimeout(scrollToTop, 100);
+            
             setTimeout(() => {
                 if (!document.querySelector('.region-tooltip')) {
                     initKazakhstanMap();
                 }
             }, 500);
+            
+            // Инициализация стрелок таймлайна
+            initTimelineArrows();
         });
+
+        // Функция инициализации стрелок таймлайна
+        function initTimelineArrows() {
+            const timelineWrapper = document.getElementById('timelineWrapper');
+            const leftArrow = document.getElementById('timelineArrowLeft');
+            const rightArrow = document.getElementById('timelineArrowRight');
+            
+            if (!timelineWrapper || !leftArrow || !rightArrow) {
+                return;
+            }
+            
+            // Величина прокрутки за один клик (ширина одного элемента + gap)
+            const scrollAmount = 380; // 300px ширина + 80px gap
+            
+            // Обновление состояния стрелок
+            function updateArrowsState() {
+                const scrollLeft = timelineWrapper.scrollLeft;
+                const maxScroll = timelineWrapper.scrollWidth - timelineWrapper.clientWidth;
+                
+                // Левая стрелка - неактивна в начале
+                if (scrollLeft <= 0) {
+                    leftArrow.disabled = true;
+                } else {
+                    leftArrow.disabled = false;
+                }
+                
+                // Правая стрелка - неактивна в конце
+                if (scrollLeft >= maxScroll - 5) {
+                    rightArrow.disabled = true;
+                } else {
+                    rightArrow.disabled = false;
+                }
+            }
+            
+            // Прокрутка влево
+            leftArrow.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                timelineWrapper.scrollBy({
+                    left: -scrollAmount,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Прокрутка вправо
+            rightArrow.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                timelineWrapper.scrollBy({
+                    left: scrollAmount,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Обновляем состояние при прокрутке
+            timelineWrapper.addEventListener('scroll', updateArrowsState);
+            
+            // Начальное состояние стрелок
+            updateArrowsState();
+        }
 
         // Функции для управления игровым диалоговым окном
         let dialogShown = false; // Флаг для предотвращения множественного показа
