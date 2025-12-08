@@ -1002,7 +1002,7 @@ import * as THREE from 'three';
             const freeSpace = document.querySelector('.free_space');
             if (freeSpace) {
                 // Получаем длину скролла из ScrollTrigger
-                const scrollLength = 4100; // Длина скролла в пикселях (должна совпадать с end: "+=7100px")
+                const scrollLength = 7100; // Длина скролла в пикселях (должна совпадать с end: "+=7100px")
                 
                 // Вычисляем 50svh в пикселях
                 const svh50 = window.innerHeight * 0.5; // 50svh = 50% от высоты viewport
@@ -1246,21 +1246,53 @@ import * as THREE from 'three';
         const targetPosition7 = { x: -0.5, y: 13, z: 0.6 };
         const targetRotation7 = { x: 4.7, y: 5.8, z: 0 };
         
+        // ===== НАСТРОЙКИ ЧЕКПОИНТОВ (все значения в пикселях) =====
+        const CHECKPOINT_PATH = 500;    // Путь до каждого чекпоинта (px)
+        const CHECKPOINT_PAUSE = 700;   // Пауза на каждом чекпоинте (px)
+        
+        // Вычисляем позиции для каждого этапа (7 чекпоинтов, 6 пауз)
+        // Чекпоинт 1: путь 0-500, пауза 500-800
+        // Чекпоинт 2: путь 800-1300, пауза 1300-1600
+        // Чекпоинт 3: путь 1600-2100, пауза 2100-2400
+        // Чекпоинт 4: путь 2400-2900, пауза 2900-3200
+        // Чекпоинт 5: путь 3200-3700, пауза 3700-4000
+        // Чекпоинт 6: путь 4000-4500, пауза 4500-4800
+        // Чекпоинт 7: путь 4800-5300 (без паузы)
+        
+        const stage1PathEnd = CHECKPOINT_PATH;                                    // 500
+        const stage1PauseEnd = stage1PathEnd + CHECKPOINT_PAUSE;                  // 800
+        const stage2PathEnd = stage1PauseEnd + CHECKPOINT_PATH;                   // 1300
+        const stage2PauseEnd = stage2PathEnd + CHECKPOINT_PAUSE;                  // 1600
+        const stage3PathEnd = stage2PauseEnd + CHECKPOINT_PATH;                   // 2100
+        const stage3PauseEnd = stage3PathEnd + CHECKPOINT_PAUSE;                  // 2400
+        const stage4PathEnd = stage3PauseEnd + CHECKPOINT_PATH;                   // 2900
+        const stage4PauseEnd = stage4PathEnd + CHECKPOINT_PAUSE;                  // 3200
+        const stage5PathEnd = stage4PauseEnd + CHECKPOINT_PATH;                   // 3700
+        const stage5PauseEnd = stage5PathEnd + CHECKPOINT_PAUSE;                  // 4000
+        const stage6PathEnd = stage5PauseEnd + CHECKPOINT_PATH;                   // 4500
+        const stage6PauseEnd = stage6PathEnd + CHECKPOINT_PAUSE;                  // 4800
+        const stage7PathEnd = stage6PauseEnd + CHECKPOINT_PATH;                   // 5300
+        
+        const TOTAL_SCROLL = stage7PathEnd;  // Общая длина скролла
+        
         ScrollTrigger.create({
             trigger: "body",
             start: "top top",
-            end: "+=4100px", // Увеличиваем общую длину для семи этапов + паузы
+            end: "+=" + TOTAL_SCROLL + "px",
             scrub: 1,
             onUpdate: (self) => {
-                isScrolling = self.progress > 0.01;
+                // Текущая позиция скролла в пикселях
+                const scrollPx = self.progress * TOTAL_SCROLL;
                 
-                // Отладка прогресса скролла
-                if (self.progress > 0.95) {
-                    console.log('Прогресс скролла:', self.progress);
+                isScrolling = scrollPx > 10;
+                
+                // Отладка позиции скролла
+                if (scrollPx > TOTAL_SCROLL - 300) {
+                    console.log('Позиция скролла (px):', Math.round(scrollPx));
                 }
                 
-                // Управление первым диалоговым окном (показываем сразу при достижении второго чекпоинта)
-                if (self.progress >= 0.2 && self.progress < 0.25) {
+                // Управление первым диалоговым окном (показываем на паузе 2-го чекпоинта)
+                if (scrollPx >= stage2PathEnd && scrollPx < stage2PauseEnd) {
                     if (!dialogShown) {
                         console.log('Достигнут второй чекпоинт - показываем первое диалоговое окно');
                         showDialog();
@@ -1278,9 +1310,20 @@ import * as THREE from 'three';
                     canvas.style.transform = 'translate3d(0px, 0px, 0)';
                 }
                 
+                // Гарантированно скрываем текст при возврате к началу (первые 80% первого этапа)
+                const targetTextGlobal = document.querySelector('.yurt-target-text');
+                if (targetTextGlobal && scrollPx < CHECKPOINT_PATH * 0.8) {
+                    gsap.to(targetTextGlobal, {
+                        opacity: 0,
+                        x: 50,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                }
+                
                 if (yurtModel) {
                     // Сохраняем изначальные значения при первом скролле
-                    if (self.progress === 0) {
+                    if (scrollPx === 0) {
                         originalYurtPosition.x = yurtModel.position.x;
                         originalYurtPosition.y = yurtModel.position.y;
                         originalYurtPosition.z = yurtModel.position.z;
@@ -1296,32 +1339,11 @@ import * as THREE from 'three';
                     yurtCanvas.style.left = '0';
                     yurtCanvas.style.zIndex = '2';
                     
-                    // Определяем этапы анимации с паузами
-                    const firstStageEnd = 0.07; // 7% - конец первого этапа
-                    const firstPauseStart = 0.07; // 7% - начало первой паузы
-                    const firstPauseEnd = 0.08; // 8% - конец первой паузы (сокращено)
-                    const secondStageStart = 0.1; // 10% - начало второго этапа
-                    const secondPauseStart = 0.18; // 18% - начало второй паузы
-                    const secondPauseEnd = 0.21; // 21% - конец второй паузы (100px)
-                    const thirdStageStart = 0.45; // 45% - начало третьего этапа
-                    const thirdPauseStart = 0.52; // 52% - начало третьей паузы
-                    const thirdPauseEnd = 0.55; // 55% - конец третьей паузы (100px)
-                    const fourthStageStart = 0.63; // 63% - начало четвертого этапа
-                    const fourthPauseStart = 0.7; // 70% - начало четвертой паузы
-                    const fourthPauseEnd = 0.73; // 73% - конец четвертой паузы (100px)
-                    const fifthStageStart = 0.76; // 76% - начало пятого этапа
-                    const fifthPauseStart = 0.83; // 83% - начало пятой паузы
-                    const fifthPauseEnd = 0.86; // 86% - конец пятой паузы (100px)
-                    const sixthStageStart = 0.89; // 89% - начало шестого этапа
-                    const sixthPauseStart = 0.96; // 96% - начало шестой паузы
-                    const sixthPauseEnd = 0.99; // 99% - конец шестой паузы (100px)
-                    const seventhStageStart = 0.99; // 99% - начало седьмого этапа
+                    // ===== ЛОГИКА ДВИЖЕНИЯ ПО ЧЕКПОИНТАМ =====
                     
-                    let currentProgress = self.progress;
-                    
-                    if (currentProgress <= firstStageEnd) {
-                        // Первый этап: движение к первой цели
-                        const stageProgress = currentProgress / firstStageEnd;
+                    if (scrollPx <= stage1PathEnd) {
+                        // Этап 1: движение к первой цели (0 - 500px)
+                        const stageProgress = scrollPx / CHECKPOINT_PATH;
                         
                         yurtModel.position.x = originalYurtPosition.x + (targetPosition.x - originalYurtPosition.x) * stageProgress;
                         yurtModel.position.y = originalYurtPosition.y + (targetPosition.y - originalYurtPosition.y) * stageProgress;
@@ -1351,8 +1373,8 @@ import * as THREE from 'three';
                             }
                         }
                         
-                    } else if (currentProgress >= firstPauseStart && currentProgress <= firstPauseEnd) {
-                        // Первая пауза: юрта остается в первой позиции
+                    } else if (scrollPx <= stage1PauseEnd) {
+                        // Пауза 1: юрта остается в первой позиции (500 - 800px)
                         yurtModel.position.x = targetPosition.x;
                         yurtModel.position.y = targetPosition.y;
                         yurtModel.position.z = targetPosition.z;
@@ -1360,9 +1382,9 @@ import * as THREE from 'three';
                         yurtModel.rotation.y = targetRotation.y;
                         yurtModel.rotation.z = targetRotation.z;
                         
-                    } else if (currentProgress >= secondStageStart && currentProgress < secondPauseStart) {
-                        // Второй этап: движение ко второй цели
-                        const stageProgress = (currentProgress - secondStageStart) / (secondPauseStart - secondStageStart);
+                    } else if (scrollPx <= stage2PathEnd) {
+                        // Этап 2: движение ко второй цели (800 - 1300px)
+                        const stageProgress = (scrollPx - stage1PauseEnd) / CHECKPOINT_PATH;
                         
                         yurtModel.position.x = targetPosition.x + (targetPosition2.x - targetPosition.x) * stageProgress;
                         yurtModel.position.y = targetPosition.y + (targetPosition2.y - targetPosition.y) * stageProgress;
@@ -1383,8 +1405,8 @@ import * as THREE from 'three';
                             });
                         }
                         
-                    } else if (currentProgress >= secondPauseStart && currentProgress <= secondPauseEnd) {
-                        // Вторая пауза: юрта остается во второй позиции
+                    } else if (scrollPx <= stage2PauseEnd) {
+                        // Пауза 2: юрта остается во второй позиции (1300 - 1600px)
                         yurtModel.position.x = targetPosition2.x;
                         yurtModel.position.y = targetPosition2.y;
                         yurtModel.position.z = targetPosition2.z;
@@ -1392,9 +1414,9 @@ import * as THREE from 'three';
                         yurtModel.rotation.y = targetRotation2.y;
                         yurtModel.rotation.z = targetRotation2.z;
                         
-                    } else if (currentProgress > thirdStageStart && currentProgress < thirdPauseStart) {
-                        // Третий этап: движение к третьей цели
-                        const stageProgress = (currentProgress - thirdStageStart) / (thirdPauseStart - thirdStageStart);
+                    } else if (scrollPx <= stage3PathEnd) {
+                        // Этап 3: движение к третьей цели (1600 - 2100px)
+                        const stageProgress = (scrollPx - stage2PauseEnd) / CHECKPOINT_PATH;
                         
                         yurtModel.position.x = targetPosition2.x + (targetPosition3.x - targetPosition2.x) * stageProgress;
                         yurtModel.position.y = targetPosition2.y + (targetPosition3.y - targetPosition2.y) * stageProgress;
@@ -1416,8 +1438,8 @@ import * as THREE from 'three';
                             hideDialog2();
                         }
                         
-                    } else if (currentProgress >= thirdPauseStart && currentProgress <= thirdPauseEnd) {
-                        // Третья пауза: юрта остается в третьей позиции
+                    } else if (scrollPx <= stage3PauseEnd) {
+                        // Пауза 3: юрта остается в третьей позиции (2100 - 2400px)
                         yurtModel.position.x = targetPosition3.x;
                         yurtModel.position.y = targetPosition3.y;
                         yurtModel.position.z = targetPosition3.z;
@@ -1431,9 +1453,9 @@ import * as THREE from 'three';
                             showDialog2();
                         }
                         
-                    } else if (currentProgress > fourthStageStart && currentProgress < fourthPauseStart) {
-                        // Четвертый этап: движение к четвертой цели
-                        const stageProgress = (currentProgress - fourthStageStart) / (fourthPauseStart - fourthStageStart);
+                    } else if (scrollPx <= stage4PathEnd) {
+                        // Этап 4: движение к четвертой цели (2400 - 2900px)
+                        const stageProgress = (scrollPx - stage3PauseEnd) / CHECKPOINT_PATH;
                         
                         yurtModel.position.x = targetPosition3.x + (targetPosition4.x - targetPosition3.x) * stageProgress;
                         yurtModel.position.y = targetPosition3.y + (targetPosition4.y - targetPosition3.y) * stageProgress;
@@ -1455,8 +1477,8 @@ import * as THREE from 'three';
                             hideDialog3();
                         }
                         
-                    } else if (currentProgress >= fourthPauseStart && currentProgress <= fourthPauseEnd) {
-                        // Четвертая пауза: юрта остается в четвертой позиции
+                    } else if (scrollPx <= stage4PauseEnd) {
+                        // Пауза 4: юрта остается в четвертой позиции (2900 - 3200px)
                         yurtModel.position.x = targetPosition4.x;
                         yurtModel.position.y = targetPosition4.y;
                         yurtModel.position.z = targetPosition4.z;
@@ -1470,9 +1492,9 @@ import * as THREE from 'three';
                             showDialog3();
                         }
                         
-                    } else if (currentProgress > fifthStageStart && currentProgress < fifthPauseStart) {
-                        // Пятый этап: движение к пятой цели
-                        const stageProgress = (currentProgress - fifthStageStart) / (fifthPauseStart - fifthStageStart);
+                    } else if (scrollPx <= stage5PathEnd) {
+                        // Этап 5: движение к пятой цели (3200 - 3700px)
+                        const stageProgress = (scrollPx - stage4PauseEnd) / CHECKPOINT_PATH;
                         
                         yurtModel.position.x = targetPosition4.x + (targetPosition5.x - targetPosition4.x) * stageProgress;
                         yurtModel.position.y = targetPosition4.y + (targetPosition5.y - targetPosition4.y) * stageProgress;
@@ -1488,7 +1510,7 @@ import * as THREE from 'three';
                             hideDialog3();
                         }
                         
-                        // Изменяем фон space_1 при достижении 5 чекпоинта
+                        // Изменяем фон space_1 при достижении 5 чекпоинта (после 150px пути)
                         if (stageProgress >= 0.3) {
                             const space1 = document.getElementById('space_1');
                             if (space1) {
@@ -1499,7 +1521,7 @@ import * as THREE from 'three';
                             // Возвращаем исходный фон space_1 при скролле обратно
                             const space1 = document.getElementById('space_1');
                             if (space1) {
-                                space1.style.background = ''; // Возвращаем исходный фон
+                                space1.style.background = '';
                                 space1.style.transition = 'background 1s ease-in-out';
                             }
                         }
@@ -1510,8 +1532,8 @@ import * as THREE from 'three';
                             hideDialog4();
                         }
                         
-                    } else if (currentProgress >= fifthPauseStart && currentProgress <= fifthPauseEnd) {
-                        // Пятая пауза: юрта остается в пятой позиции
+                    } else if (scrollPx <= stage5PauseEnd) {
+                        // Пауза 5: юрта остается в пятой позиции (3700 - 4000px)
                         yurtModel.position.x = targetPosition5.x;
                         yurtModel.position.y = targetPosition5.y;
                         yurtModel.position.z = targetPosition5.z;
@@ -1525,9 +1547,9 @@ import * as THREE from 'three';
                             showDialog4();
                         }
                         
-                    } else if (currentProgress > sixthStageStart && currentProgress < sixthPauseStart) {
-                        // Шестой этап: движение к шестой цели
-                        const stageProgress = (currentProgress - sixthStageStart) / (sixthPauseStart - sixthStageStart);
+                    } else if (scrollPx <= stage6PathEnd) {
+                        // Этап 6: движение к шестой цели (4000 - 4500px)
+                        const stageProgress = (scrollPx - stage5PauseEnd) / CHECKPOINT_PATH;
                         
                         yurtModel.position.x = targetPosition5.x + (targetPosition6.x - targetPosition5.x) * stageProgress;
                         yurtModel.position.y = targetPosition5.y + (targetPosition6.y - targetPosition5.y) * stageProgress;
@@ -1543,8 +1565,8 @@ import * as THREE from 'three';
                             hideDialog4();
                         }
                         
-                    } else if (currentProgress >= sixthPauseStart && currentProgress <= sixthPauseEnd) {
-                        // Шестая пауза: юрта остается в шестой позиции
+                    } else if (scrollPx <= stage6PauseEnd) {
+                        // Пауза 6: юрта остается в шестой позиции (4500 - 4800px)
                         yurtModel.position.x = targetPosition6.x;
                         yurtModel.position.y = targetPosition6.y;
                         yurtModel.position.z = targetPosition6.z;
@@ -1552,9 +1574,9 @@ import * as THREE from 'three';
                         yurtModel.rotation.y = targetRotation6.y;
                         yurtModel.rotation.z = targetRotation6.z;
                         
-                    } else if (currentProgress > seventhStageStart) {
-                        // Седьмой этап: движение к седьмой цели
-                        const stageProgress = (currentProgress - seventhStageStart) / (1 - seventhStageStart);
+                    } else if (scrollPx <= stage7PathEnd) {
+                        // Этап 7: движение к седьмой цели (4800 - 5300px)
+                        const stageProgress = (scrollPx - stage6PauseEnd) / CHECKPOINT_PATH;
                         
                         yurtModel.position.x = targetPosition6.x + (targetPosition7.x - targetPosition6.x) * stageProgress;
                         yurtModel.position.y = targetPosition6.y + (targetPosition7.y - targetPosition6.y) * stageProgress;
@@ -1564,7 +1586,7 @@ import * as THREE from 'three';
                         yurtModel.rotation.y = targetRotation6.y + (targetRotation7.y - targetRotation6.y) * stageProgress;
                         yurtModel.rotation.z = targetRotation6.z + (targetRotation7.z - targetRotation6.z) * stageProgress;
                         
-                        // Скрываем канвас и techGrid при достижении последнего чекпоинта
+                        // Скрываем канвас и techGrid при достижении последнего чекпоинта (после 250px пути)
                         if (stageProgress >= 0.5) {
                             const canvas = document.querySelector('canvas');
                             const techGrid = document.getElementById('techGrid');
