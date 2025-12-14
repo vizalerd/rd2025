@@ -7,39 +7,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
     
-    <!-- Прокрутка в начало при загрузке -->
+    <!-- Отключить автоматическое восстановление позиции скролла -->
     <script>
         // Отключить автоматическое восстановление позиции скролла
         if ('scrollRestoration' in history) {
             history.scrollRestoration = 'manual';
         }
-        
-        // Немедленная прокрутка в начало
-        window.scrollTo(0, 0);
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-        
-        // Прокрутка при загрузке DOM
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                window.scrollTo(0, 0);
-                document.documentElement.scrollTop = 0;
-                document.body.scrollTop = 0;
-            });
-        } else {
-            window.scrollTo(0, 0);
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-        }
-        
-        // Прокрутка при полной загрузке
-        window.addEventListener('load', function() {
-            window.scrollTo(0, 0);
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-        });
+        // Прокрутка в начало обрабатывается в script.js через функцию scrollToTop()
     </script>
     
     <!-- GSAP CDN -->
@@ -71,27 +46,21 @@
             <div id="ornamentsCanvas"></div>
             
             <!-- Видео для CRT эффекта -->
-            <video id="crtVideo" style="display: none;" loop muted autoplay>
+            <!-- <video id="crtVideo" style="display: none;" loop muted autoplay>
                 <source src="video.mp4" type="video/mp4">
-            </video>
+            </video> -->
             
             <div id="loading">Загрузка 3D модели...</div>
             <div id="error"></div>
         
         <!-- Меню -->
         <nav class="menu">
-            <!-- Бургер меню -->
-            <div class="burger-menu">
-                <button class="burger-btn" id="burgerBtn">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <a href="#" class="dropdown-item">История</a>
-                    <a href="#" class="dropdown-item">Игра</a>
-                    <a href="#" class="dropdown-item">Интересное</a>
+            <!-- Фото профиля -->
+            <div class="profile-photo">
+                <div class="profile-photo-img-wrapper">
+                    <img src="https://cdn.jsdelivr.net/gh/vizalerd/rd2025@latest/ava.png" alt="Profile">
                 </div>
+                <span class="profile-tooltip">Мне нужна Ваша помощь! Скорее переходите к игре!</span>
             </div>
             
             <!-- Логотип -->
@@ -122,15 +91,7 @@
         </nav>
     </div>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
-                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
-            }
-        }
-    </script>
-    <script type="module" src="script.js"></script>
+    
     
     <!-- Заголовок "День Независимости" -->
     <div class="title">
@@ -183,8 +144,8 @@
                 <div class="rules-content">
                     <h2>📋 Правила игры</h2>
                     <div class="rules-text">
-                        <p>1. Посетите каждый регион, ответьте правильно на вопрос.</p>
-                        <p>2. Запас прочности вашего электросамокатолета равен не бесконечен - Вы можете ошибиться не больше 5 раз, после чего он сломается</p>
+                        <p>1. Посетите каждый регион, нажимая на него, ответьте правильно на вопрос</p>
+                        <p>2. Запас прочности вашего электросамокатолета не бесконечен - Вы можете ошибиться не больше 5 раз, после чего он сломается</p>
                     </div>
                     <button class="understand-button" onclick="closeRules()">Понятно</button>
                 </div>
@@ -346,8 +307,8 @@
         <!-- Окно "Случайная встреча" -->
         <div class="encounter-modal" id="encounterModal">
             <div class="encounter-content">
-                <h2>🎲 Случайная встреча!</h2>
-                <p>Вы встретили интересного человека, который хочет задать вам вопрос!</p>
+                <h2>🎲 Случайное событие!</h2>
+                <p>На вашем пути встретилось препядствие, требующее вашего внимания!</p>
                 <p class="click-hint">👆 Нажмите для продолжения</p>
             </div>
         </div>
@@ -358,6 +319,16 @@
                 <h2><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f62d.svg" alt="😭" style="width: 40px; height: 40px; vertical-align: middle; margin-right: 10px;"> Игра окончена!</h2>
                 <p>Электросамокатолет сломался. Ержан не смог добраться домой!</p>
                 <button class="restart-button" onclick="restartGame()">🔄 Начать заново</button>
+            </div>
+        </div>
+
+        <!-- Окно победы -->
+        <div class="win-modal" id="winModal">
+            <div class="win-content">
+                <h2>Победа!</h2>
+                <img src="https://raw.githubusercontent.com/vizalerd/rd2025/main/win.webp" alt="Победа" class="win-image">
+                <p>Благодаря Вашей помощи, Ержан успел все подготовить и теперь может отпраздновать в кругу семьи этот великий праздник!</p>
+                <button class="restart-button" onclick="restartGame()">Закрыть</button>
             </div>
         </div>
     </section>
@@ -374,7 +345,15 @@
     <div class="dialog-overlay" id="dialogOverlay2">
         <div class="dialog-window">
             <h2 class="dialog-title">История Дня Независимости</h2>
-            <img src="https://optim.tildacdn.pro/tild6263-3537-4334-b362-313439643564/-/format/webp/vecher.png.webp" alt="Вечер" class="dialog-timeline-image">
+            <div class="dialog-intro-container">
+                <video class="dialog-intro-video" autoplay muted loop playsinline>
+                    <source src="https://raw.githubusercontent.com/vizalerd/rd2025/main/vid2.mp4" type="video/mp4">
+                </video>
+                <div class="dialog-intro-text">
+                    <p>Начало 90-х годов – период глобальных изменений, происходивших в национальных республиках СССР. Экономическая и политическая нестабильность в стране стала причиной социальной напряженности, которая только росла. Люди понимали, что пришло время перемен.</p>
+                    <p>К осени 1990 года практически все союзные республики СССР официально объявили о своем суверенитете, а некоторые даже о независимости. Было очевидно, что изменения грядут и в Казахстане.</p>
+                </div>
+            </div>
             <div class="timeline-container">
                 <button class="timeline-arrow timeline-arrow-left" id="timelineArrowLeft">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -452,10 +431,14 @@
     <!-- Третье диалоговое окно для четвертого чекпоинта -->
     <div class="dialog-overlay" id="dialogOverlay3">
         <div class="dialog-window">
-            <h2 class="dialog-title">Закон "О государственной Независимости Республики Казахстан"</h2>
-            <img src="https://raw.githubusercontent.com/vizalerd/rd2025/main/nan.gif" alt="Декларация" class="dialog-timeline-image">
+            <div class="dialog-title-video-container">
+                <h2 class="dialog-title dialog-title-left">Закон "О государственной Независимости Республики Казахстан"</h2>
+                <video class="dialog-intro-video dialog-video-right" autoplay muted loop playsinline>
+                    <source src="https://raw.githubusercontent.com/vizalerd/rd2025/main/vid1.mp4" type="video/mp4">
+                </video>
+            </div>
             <div class="dialog-quote">
-                <p><strong>Первые 5 статей:</strong></p><br>
+                <p><strong>Первые 5 статей Закона "О государственной Независимости Республики Казахстан":</strong></p><br>
                 <p><strong>Статья 1.</strong> Республика Казахстан – независимое, демократическое и правовое государство. Она обладает всей полнотой власти на своей территории, самостоятельно определяет и проводит внутреннюю и внешнюю политику.</p><br>
                 <p><strong>Статья 2.</strong> Республика Казахстан строит свои взаимоотношения со всеми государствами на принципах международного права.</p><br>
                 <p><strong>Статья 3.</strong> Республика Казахстан открыта для признания ее государственной независимости другими государствами.</p><br>
@@ -474,7 +457,9 @@
                     <div class="slider-track" id="sliderTrack">
                         <div class="personality-card active">
                             <div class="personality-photo">
-                                <img src="https://raw.githubusercontent.com/vizalerd/rd2025/main/salyk.gif" alt="Салык Зиманов">
+                                <video autoplay muted loop playsinline>
+                                    <source src="https://raw.githubusercontent.com/vizalerd/rd2025/main/salyk.mp4" type="video/mp4">
+                                </video>
                             </div>
                             <div class="personality-info">
                                 <h3 class="personality-name">Салык Зиманов</h3>
@@ -485,7 +470,9 @@
                         
                         <div class="personality-card">
                             <div class="personality-photo">
-                                <img src="https://raw.githubusercontent.com/vizalerd/rd2025/main/salyk.gif" alt="">
+                                <video autoplay muted loop playsinline>
+                                    <source src="https://raw.githubusercontent.com/vizalerd/rd2025/main/vid3.mp4" type="video/mp4">
+                                </video>
                             </div>
                             <div class="personality-info">
                                 <h3 class="personality-name">Ерик Асанбаев</h3>
@@ -496,7 +483,9 @@
                         
                         <div class="personality-card">
                             <div class="personality-photo">
-                                <img src="https://raw.githubusercontent.com/vizalerd/rd2025/main/salyk.gif" alt="">
+                                <video autoplay muted loop playsinline>
+                                    <source src="https://raw.githubusercontent.com/vizalerd/rd2025/main/vid4.mp4" type="video/mp4">
+                                </video>
                             </div>
                             <div class="personality-info">
                                 <h3 class="personality-name">Зинаида Федотова</h3>
@@ -565,5 +554,14 @@
              
 
         </footer>
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+                }
+            }
+        </script>
 </body>
 </html>
